@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - RiftCloud Development</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0a2f1a, #1a4a2a); min-height: 100vh; color: white; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .glass-nav { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border-radius: 2rem; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem; font-weight: bold; }
+        .logo i { color: #ffd700; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; transition: 0.3s; }
+        .nav-links a:hover { color: #ffd700; }
+        .tracking-box { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 2rem; border: 1px solid #ffd700; }
+        .input-group { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .tracking-input { flex: 1; padding: 1rem; background: rgba(0,0,0,0.5); border: 1px solid #ffd700; border-radius: 1rem; color: white; font-size: 1rem; }
+        .track-btn { padding: 1rem 2rem; background: linear-gradient(135deg, #ffd700, #ffaa00); border: none; border-radius: 1rem; color: #1a2a1a; font-weight: bold; cursor: pointer; }
+        .order-card { background: rgba(0,0,0,0.4); border-radius: 1rem; padding: 1.5rem; margin-top: 1rem; border: 1px solid #ffd700; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .status-badge { padding: 0.3rem 1rem; border-radius: 2rem; font-weight: bold; }
+        .status-pending { background: #ff9900; }
+        .status-completed { background: #00ff00; color: #000; }
+        .order-details { margin: 1rem 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .invoice-btn, .print-btn { padding: 0.5rem 1rem; border-radius: 2rem; border: none; cursor: pointer; margin-right: 1rem; }
+        .invoice-btn { background: #ffd700; color: #000; }
+        .print-btn { background: #5865F2; color: white; }
+        .not-found { text-align: center; padding: 3rem; background: rgba(0,0,0,0.5); border-radius: 1rem; }
+        footer { text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid rgba(255,215,0,0.2); color: #aaa; }
+        @media (max-width: 768px) { .glass-nav { flex-direction: column; text-align: center; } .nav-links a { margin: 0 0.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="glass-nav">
+            <div class="logo"><i class="fas fa-gem"></i><span>RIFTCLOUD</span></div>
+            <div class="nav-links"><a href="index.html">Home</a><a href="index.html#packages">Packages</a><a href="tracking.html">Track Order</a></div>
+        </nav>
+        
+        <div class="tracking-box">
+            <h2 style="text-align:center; margin-bottom:1rem;"><i class="fas fa-search"></i> Track Your Order</h2>
+            <div class="input-group">
+                <input type="text" id="trackingId" placeholder="Enter Order ID (e.g., RIFT1234567890)" class="tracking-input">
+                <button class="track-btn" onclick="trackOrder()"><i class="fas fa-search"></i> Track</button>
+            </div>
+            <div id="result"></div>
+        </div>
+        
+        <footer><p>© 2024 RiftCloud Development | UPI: johnsbiju@fam</p></footer>
+    </div>
+    
+    <script>
+        function getOrderById(id) {
+            const orders = JSON.parse(localStorage.getItem('riftcloud_orders')) || [];
+            return orders.find(o => o.id === id);
+        }
+        
+        function trackOrder() {
+            const orderId = document.getElementById('trackingId').value.trim();
+            if (!orderId) { alert('Enter Order ID'); return; }
+            const order = getOrderById(orderId);
+            const resultDiv = document.getElementById('result');
+            if (order) {
+                resultDiv.innerHTML = `
+                    <div class="order-card">
+                        <div class="order-header"><strong>${order.id}</strong><span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span></div>
+                        <div class="order-details">
+                            <div class="detail-row"><span>Service:</span><span>${order.service}</span></div>
+                            <div class="detail-row"><span>Amount:</span><span>₹${order.amount}</span></div>
+                            <div class="detail-row"><span>Date:</span><span>${new Date(order.timestamp).toLocaleString()}</span></div>
+                            <div class="detail-row"><span>Transaction ID:</span><span>${order.transactionId || 'N/A'}</span></div>
+                            <div class="detail-row"><span>Discord:</span><span>${order.customerName || 'N/A'}</span></div>
+                            <div class="detail-row"><span>Email:</span><span>${order.customerEmail || 'N/A'}</span></div>
+                        </div>
+                        <button class="invoice-btn" onclick="downloadInvoice('${order.id}')"><i class="fas fa-download"></i> Download Invoice</button>
+                        <button class="print-btn" onclick="printInvoice('${order.id}')"><i class="fas fa-print"></i> Print Invoice</button>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `<div class="not-found"><i class="fas fa-exclamation-triangle"></i><h3>Order Not Found</h3><p>Check Order ID or contact support on Discord</p></div>`;
+            }
+        }
+        
+        function generateInvoice(order) {
+            return `<div style="font-family:Arial;max-width:800px;margin:0 auto;background:white;color:#333;padding:2rem;border-radius:10px;"><div style="text-align:center;border-bottom:2px solid #ffd700;"><h1>RIFTCLOUD DEVELOPMENT</h1><p>UPI: johnsbiju@fam | Discord: discord.gg/rCzR5X9KR6</p></div><h2>INVOICE</h2><p><strong>Order ID:</strong> ${order.id}</p><p><strong>Service:</strong> ${order.service}</p><p><strong>Amount:</strong> ₹${order.amount}</p><p><strong>Date:</strong> ${new Date(order.timestamp).toLocaleString()}</p><p><strong>Customer:</strong> ${order.customerName}</p><p><strong>Email:</strong> ${order.customerEmail}</p><p><strong>Transaction ID:</strong> ${order.transactionId}</p><div style="margin-top:2rem;text-align:center;"><p>Thank you for choosing RiftCloud!</p></div></div>`;
+        }
+        
+        function downloadInvoice(id) {
+            const order = getOrderById(id);
+            if(order){ const win=window.open('','_blank'); win.document.write(generateInvoice(order)); win.document.close(); win.print(); }
+        }
+        function printInvoice(id) { downloadInvoice(id); }
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        if (orderId) { document.getElementById('trackingId').value = orderId; trackOrder(); }
+    </script>
+</body>
+</html>

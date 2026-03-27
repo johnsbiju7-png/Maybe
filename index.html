@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiftCloud Development — Premium Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* ========== LOADING SCREEN ========== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a2f1a, #1a4a2a, #0a2f1a);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            animation: pulseGlow 1s ease-in-out infinite;
+        }
+
+        .loading-crystal {
+            font-size: 5rem;
+            color: #ffd700;
+            animation: rotateCrystal 1s linear infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes rotateCrystal {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-counter {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Orbitron', monospace;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .loading-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: #ffd700;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { text-shadow: 0 0 10px #ffd700; }
+            50% { text-shadow: 0 0 30px #ffaa00; }
+        }
+
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Currency Notes Falling Background */
+        .currency-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a2f1a 0%, #1a4a2a 50%, #0a2f1a 100%);
+        }
+
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('10750.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.25;
+            filter: blur(3px);
+        }
+
+        .falling-notes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .note {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border: 2px solid #ff6600;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #006600;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .note::before {
+            content: "₹";
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff6600;
+        }
+
+        .note::after {
+            content: "100";
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .dark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: -5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Glass Navigation */
+        .glass-nav {
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 5px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            color: #ffd700;
+            font-size: 2rem;
+            text-shadow: 0 0 15px #ffd700;
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { text-shadow: 0 0 10px #ffd700; }
+            50% { text-shadow: 0 0 25px #ffaa00; }
+        }
+
+        .logo span:first-of-type {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-badge {
+            font-size: 0.7rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .discord-btn, .staff-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .discord-btn {
+            background: #5865F2;
+            color: white;
+        }
+
+        .staff-btn {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #ffd700;
+            color: white;
+        }
+
+        .discord-btn:hover, .staff-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 70vh;
+            padding: 2rem 0;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .hero-content {
+            flex: 1;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .crystal-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 170, 0, 0.3));
+            border: 1px solid #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 5px #ffd700; }
+            50% { box-shadow: 0 0 15px #ffaa00; }
+        }
+
+        .glow-text {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .rift-text {
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ff6600);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: block;
+        }
+
+        .dev-text {
+            font-size: 2rem;
+            color: #fff;
+            display: block;
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: #ddd;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .primary-btn, .secondary-btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a2a1a;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ffd700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .primary-btn:hover, .secondary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .stats-badge {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #ddd;
+        }
+
+        .hero-crystal {
+            flex: 1;
+            text-align: center;
+        }
+
+        .floating-crystal i {
+            font-size: 10rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: floatCrystal 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px #ffd700);
+        }
+
+        @keyframes floatCrystal {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-25px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-crystal">
+                <i class="fas fa-gem"></i>
+            </div>
+            <div class="loading-counter" id="loadingCounter">0</div>
+            <div class="loading-bar">
+                <div class="loading-bar-fill" id="loadingBarFill"></div>
+            </div>
+            <div class="loading-text">RIFTCLOUD LOADING...</div>
+        </div>
+    </div>
+
+    <!-- CURRENCY NOTES FALLING BACKGROUND -->
+    <div class="currency-bg">
+        <div class="bg-image"></div>
+        <div class="falling-notes" id="fallingNotes"></div>
+        <div class="dark-overlay"></div>
+    </div>
+    
+    <div class="container">
+        <nav class="glass-nav">
+            <div class="logo">
+                <i class="fas fa-gem"></i>
+                <span>RIFTCLOUD</span>
+                <span class="logo-badge">PREMIUM</span>
+            </div>
+            <div class="nav-links">
+                <a class="nav-link active" onclick="scrollToSection('home')">Home</a>
+                <a class="nav-link" onclick="scrollToSection('services')">Services</a>
+                <a class="nav-link" onclick="scrollToSection('packages')">Packages</a>
+                <a class="nav-link" onclick="openTracking()">Track Order</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="https://discord.gg/rCzR5X9KR6" class="discord-btn" target="_blank"><i class="fab fa-discord"></i> Discord</a>
+                <button class="staff-btn" id="staffLoginBtn"><i class="fas fa-user-shield"></i> Staff</button>
+            </div>
+        </nav>
+        
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="crystal-badge"><i class="fas fa-crown"></i> PREMIUM SERVICES</div>
+                <h1 class="glow-text"><span class="rift-text">RIFTCLOUD</span><span class="dev-text">Development Studio</span></h1>
+                <p class="hero-desc">Premium Discord Bots • Custom Servers • Professional Websites</p>
+                <div class="hero-buttons">
+                    <button class="primary-btn" onclick="scrollToSection('packages')"><i class="fas fa-gem"></i> View Packages</button>
+                    <button class="secondary-btn" onclick="openTracking()"><i class="fas fa-search"></i> Track Order</button>
+                </div>
+                <div class="stats-badge">
+                    <div class="stat"><span class="stat-number">1000+</span><span class="stat-label">Clients Served</span></div>
+                    <div class="stat"><span class="stat-number">500+</span><span class="stat-label">Discord Bots</span></div>
+                    <div class="stat"><span class="stat-number">200+</span><span class="stat-label">Websites</span></div>
+                </div>
+            </div>
+            <div class="hero-crystal">
+                <div class="floating-crystal"><i class="fas fa-gem"></i></div>
+            </div>
+        </section>
+    
+    <section id="services" class="services-section">
+        <h2 class="section-title"><i class="fas fa-bolt"></i> Our Premium Services <i class="fas fa-bolt"></i></h2>
+        <div class="services-grid">
+            <div class="service-card premium-card">
+                <div class="card-icon"><i class="fab fa-discord"></i></div>
+                <h3>Custom Discord Bot</h3>
+                <p>Advanced bots with moderation, economy, music, ticket system</p>
+                <div class="price-range">₹99 - ₹299</div>
+                <button class="buy-btn" onclick="openPayment('Custom Discord Bot', 199)">Order Now</button>
+            </div>
+            <div class="service-card premium-card">
+                <div class="card-icon"><i class="fas fa-server"></i></div>
+                <h3>Discord Server Setup</h3>
+                <p>Complete server setup with roles, channels, bots, automation</p>
+                <div class="price-range">₹99 - ₹199</div>
+                <button class="buy-btn" onclick="openPayment('Discord Server Setup', 149)">Order Now</button>
+            </div>
+            <div class="service-card premium-card">
+                <div class="card-icon"><i class="fas fa-globe"></i></div>
+                <h3>Custom Website</h3>
+                <p>Professional websites with admin panel and payment integration</p>
+                <div class="price-range">₹99 - ₹399</div>
+                <button class="buy-btn" onclick="openPayment('Custom Website', 299)">Order Now</button>
+            </div>
+        </div>
+    </section>
+    
+    <section id="packages" class="packages-section">
+        <h2 class="section-title"><i class="fas fa-crown"></i> Premium Packages <i class="fas fa-crown"></i></h2>
+        <div class="packages-grid">
+            <div class="package-card">
+                <div class="package-badge">STARTER</div>
+                <div class="package-icon"><i class="fas fa-rocket"></i></div>
+                <h3>Basic Bot</h3>
+                <div class="price">₹99<span>/one-time</span></div>
+                <ul>
+                    <li><i class="fas fa-check"></i> Custom Discord Bot</li>
+                    <li><i class="fas fa-check"></i> 5 Custom Commands</li>
+                    <li><i class="fas fa-check"></i> 24/7 Hosting</li>
+                </ul>
+                <button class="package-btn" onclick="openPayment('Basic Bot', 99)">Order Now</button>
+            </div>
+            <div class="package-card popular">
+                <div class="popular-badge">🔥 MOST POPULAR</div>
+                <div class="package-icon"><i class="fas fa-crown"></i></div>
+                <h3>Pro Bundle</h3>
+                <div class="price">₹299<span>/one-time</span></div>
+                <ul>
+                    <li><i class="fas fa-check"></i> Custom Discord Bot</li>
+                    <li><i class="fas fa-check"></i> Discord Server Setup</li>
+                    <li><i class="fas fa-check"></i> Custom Website</li>
+                    <li><i class="fas fa-check"></i> Premium Support</li>
+                </ul>
+                <button class="package-btn" onclick="openPayment('Pro Bundle', 299)">Order Now</button>
+            </div>
+            <div class="package-card">
+                <div class="package-badge">ULTIMATE</div>
+                <div class="package-icon"><i class="fas fa-gem"></i></div>
+                <h3>Ultimate Bundle</h3>
+                <div class="price">₹499<span>/one-time</span></div>
+                <ul>
+                    <li><i class="fas fa-check"></i> Everything in Pro</li>
+                    <li><i class="fas fa-check"></i> Full Website + Admin Panel</li>
+                    <li><i class="fas fa-check"></i> Lifetime Support</li>
+                </ul>
+                <button class="package-btn" onclick="openPayment('Ultimate Bundle', 499)">Order Now</button>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-gem"></i>
+                <span>RIFTCLOUD</span>
+                <small>Development Studio</small>
+            </div>
+            <div class="footer-info">
+                <p><i class="fas fa-phone-alt"></i> UPI ID: <strong>johnsbiju@fam</strong></p>
+                <p><i class="fab fa-discord"></i> Support: discord.gg/rCzR5X9KR6</p>
+            </div>
+            <div class="footer-links">
+                <a onclick="scrollToSection('home')">Home</a>
+                <a onclick="openTracking()">Track Order</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 RiftCloud Development Studio — Premium Services | All UPI Apps Accepted</p>
+        </div>
+    </footer>
+</div>
+
+<!-- Payment Modal -->
+<div id="upiModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-qrcode"></i> Pay with UPI</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="payment-details">
+                <p><strong>Service:</strong> <span id="modalService">-</span></p>
+                <p><strong>Amount:</strong> ₹<span id="modalAmount">-</span></p>
+            </div>
+            <div class="qr-container">
+                <h3>Scan QR Code</h3>
+                <div id="qrCode"></div>
+                <p class="upi-id">UPI ID: <strong>johnsbiju@fam</strong></p>
+            </div>
+            <div class="payment-confirmation">
+                <label><input type="checkbox" id="paymentConfirmed"> I have completed the payment</label>
+                <input type="text" id="customerDiscord" placeholder="Your Discord Username" class="discord-input">
+                <input type="email" id="customerEmail" placeholder="Your Email (for invoice)" class="discord-input">
+                <button id="confirmPaymentBtn" class="confirm-btn" onclick="confirmPayment()" disabled>Confirm Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Staff Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content login-modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-shield"></i> Staff Login</h2>
+            <span class="close-login" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="loginForm" onsubmit="return false;">
+                <input type="text" id="username" placeholder="Username" class="staff-input">
+                <input type="password" id="password" placeholder="Password" class="staff-input">
+                <button type="submit" class="login-btn" onclick="loginUser()">Login</button>
+            </form>
+            <div class="demo-credentials">
+                <p><i class="fas fa-info-circle"></i> Staff Credentials:</p>
+                <p>👑 Owner: <strong>owner321</strong></p>
+                <p>⚙️ Admin: <strong>admin - riftcloudadmin1</strong></p>
+                <p>📋 Manager: <strong>managerog123</strong></p>
+                <p>🛡️ Staff: <strong>staff1583</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Staff Dashboard Modal -->
+<div id="staffPanelModal" class="modal staff-panel">
+    <div class="modal-content staff-modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-chart-line"></i> Staff Dashboard</h2>
+            <span class="close-staff" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="staff-stats">
+                <div class="stat-box"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
+                <div class="stat-box"><h3>Pending</h3><p id="pendingOrders">0</p></div>
+                <div class="stat-box"><h3>Completed</h3><p id="completedOrders">0</p></div>
+                <div class="stat-box"><h3>Revenue</h3><p id="totalRevenue">₹0</p></div>
+            </div>
+            <div class="orders-list" id="ordersTable"></div>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Order Modal -->
+<div id="editOrderModal" class="modal">
+    <div class="modal-content edit-order-modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Edit Order</h2>
+            <span class="close-edit" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editOrderId">
+            <div class="edit-form-group">
+                <label>Service</label>
+                <input type="text" id="editService" class="admin-input">
+            </div>
+            <div class="edit-form-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="editAmount" class="admin-input">
+            </div>
+            <div class="edit-form-group">
+                <label>Status</label>
+                <select id="editStatus" class="admin-select">
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div class="edit-form-group">
+                <label>Customer Discord</label>
+                <input type="text" id="editCustomerName" class="admin-input">
+            </div>
+            <button onclick="saveOrderEdit()" class="save-edit-btn">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+    /* Additional Styles */
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin: 3rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+    .section-title i { color: #ffd700; font-size: 2rem; }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    .premium-card {
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        transition: all 0.3s;
+    }
+    .premium-card:hover { transform: translateY(-10px); border-color: #ffd700; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3); }
+    .card-icon i { font-size: 3rem; color: #ffd700; margin-bottom: 1rem; }
+    .premium-card h3 { margin-bottom: 0.5rem; }
+    .premium-card p { color: #ccc; margin-bottom: 1rem; }
+    .price-range { display: inline-block; background: linear-gradient(135deg, #ffd700, #ffaa00); padding: 0.3rem 1rem; border-radius: 2rem; font-weight: bold; margin-bottom: 1rem; color: #1a2a1a; }
+    .buy-btn, .package-btn { width: 100%; padding: 0.7rem; background: linear-gradient(135deg, #ffd700, #ffaa00); border: none; border-radius: 2rem; color: #1a2a1a; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+    .buy-btn:hover, .package-btn:hover { transform: scale(1.02); box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5); }
+    
+    .packages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    .package-card {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        transition: all 0.3s;
+        position: relative;
+    }
+    .package-card:hover { transform: translateY(-10px); border-color: #ffd700; }
+    .package-card.popular { border-color: #ffd700; transform: scale(1.02); box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+    .package-badge, .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ffd700, #ffaa00); padding: 0.3rem 1rem; border-radius: 2rem; font-size: 0.7rem; font-weight: bold; color: #1a2a1a; }
+    .popular-badge { background: #ffaa00; white-space: nowrap; }
+    .package-icon { text-align: center; font-size: 3rem; margin: 1rem 0; color: #ffd700; }
+    .package-card h3 { text-align: center; font-size: 1.5rem; }
+    .price { text-align: center; font-size: 2rem; font-weight: bold; color: #ffd700; margin-bottom: 1.5rem; }
+    .price span { font-size: 0.8rem; color: #aaa; }
+    .package-card ul { list-style: none; margin-bottom: 1.5rem; }
+    .package-card li { padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
+    .package-card li i { color: #ffd700; }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(15px);
+    }
+    .modal-content {
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+        margin: 5% auto;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 500px;
+        border: 1px solid rgba(255, 215, 0, 0.5);
+        animation: modalSlideIn 0.3s ease;
+    }
+    @keyframes modalSlideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid rgba(255, 215, 0, 0.3); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { margin: 0; color: #ffd700; }
+    .close, .close-login, .close-staff, .close-edit { font-size: 28px; cursor: pointer; color: #fff; transition: 0.3s; }
+    .close:hover, .close-login:hover, .close-staff:hover, .close-edit:hover { color: #ffd700; }
+    .modal-body { padding: 1.5rem; }
+    .payment-details { background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; }
+    .qr-container { text-align: center; margin: 1.5rem 0; }
+    #qrCode { display: inline-block; padding: 10px; background: white; border-radius: 10px; margin: 1rem 0; }
+    .upi-id { font-size: 1.2rem; color: #ffd700; }
+    .discord-input { width: 100%; padding: 0.8rem; margin: 0.5rem 0; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; color: white; }
+    .confirm-btn { background: linear-gradient(135deg, #ffd700, #ffaa00); padding: 0.8rem; border: none; border-radius: 10px; color: #1a2a1a; font-weight: bold; cursor: pointer; width: 100%; }
+    .confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .staff-modal { max-width: 900px; }
+    .staff-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-box { background: rgba(0,0,0,0.4); padding: 1rem; text-align: center; border-radius: 10px; border: 1px solid rgba(255,215,0,0.3); }
+    .stat-box h3 { font-size: 0.8rem; margin-bottom: 0.5rem; color: #ccc; }
+    .stat-box p { font-size: 1.5rem; font-weight: bold; color: #ffd700; }
+    .orders-list { max-height: 400px; overflow-y: auto; }
+    .order-item { background: rgba(0,0,0,0.3); padding: 1rem; margin-bottom: 0.5rem; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+    .order-info { flex: 1; }
+    .order-info p { margin: 0.25rem 0; font-size: 0.85rem; }
+    .order-status { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+    .status-pending { background: #ff9900; color: #000; }
+    .status-processing { background: #00ffff; color: #000; }
+    .status-completed { background: #00ff00; color: #000; }
+    .edit-btn, .delete-btn, .complete-btn { padding: 0.4rem 0.8rem; border: none; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
+    .edit-btn { background: #ffd700; color: #000; }
+    .delete-btn { background: #ff4444; color: white; }
+    .complete-btn { background: #00ff00; color: #000; }
+    .logout-btn { width: 100%; margin-top: 1rem; padding: 0.8rem; background: #ff4444; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
+    
+    .login-modal { max-width: 400px; }
+    .staff-input { width: 100%; padding: 12px; margin-bottom: 1rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; color: white; }
+    .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd700, #ffaa00); border: none; border-radius: 10px; color: #1a2a1a; font-weight: bold; cursor: pointer; }
+    .demo-credentials { margin-top: 1rem; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 10px; font-size: 0.8rem; text-align: center; }
+    .demo-credentials p { margin: 0.25rem 0; }
+    
+    .edit-order-modal { max-width: 500px; }
+    .edit-form-group { margin-bottom: 1rem; }
+    .edit-form-group label { display: block; margin-bottom: 0.5rem; color: #ffd700; }
+    .admin-input, .admin-select { width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; color: white; }
+    .save-edit-btn { width: 100%; padding: 0.8rem; background: linear-gradient(135deg, #ffd700, #ffaa00); border: none; border-radius: 10px; color: #1a2a1a; font-weight: bold; cursor: pointer; }
+    
+    footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,215,0,0.2); }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem; }
+    .footer-logo { display: flex; align-items: center; gap: 0.5rem; }
+    .footer-logo i { font-size: 2rem; color: #ffd700; }
+    .footer-info p { margin: 0.3rem 0; color: #ccc; }
+    .footer-info i { color: #ffd700; margin-right: 0.5rem; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: #ccc; text-decoration: none; cursor: pointer; }
+    .footer-links a:hover { color: #ffd700; }
+    .footer-bottom { text-align: center; padding-top: 1rem; border-top: 1px solid rgba(255,215,0,0.1); color: #aaa; font-size: 0.8rem; }
+    
+    @media (max-width: 768px) {
+        .container { padding: 1rem; }
+        .glass-nav { flex-direction: column; }
+        .nav-links { flex-wrap: wrap; justify-content: center; }
+        .glow-text { font-size: 2.5rem; }
+        .dev-text { font-size: 1.5rem; }
+        .staff-stats { grid-template-columns: repeat(2, 1fr); }
+        .footer-content { flex-direction: column; text-align: center; }
+    }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #ffd700, #ffaa00); border-radius: 10px; }
+</style>
+<script>
+    // ========== LOADING SCREEN (1-100 FAST COUNTER) ==========
+    let counter = 0;
+    const loadingScreen = document.getElementById('loadingScreen');
+    const loadingCounter = document.getElementById('loadingCounter');
+    const loadingBarFill = document.getElementById('loadingBarFill');
+    
+    function updateLoading() {
+        if (counter <= 100) {
+            loadingCounter.textContent = counter;
+            loadingBarFill.style.width = counter + '%';
+            counter++;
+            setTimeout(updateLoading, 20);
+        } else {
+            loadingScreen.classList.add('hide');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 800);
+        }
+    }
+    updateLoading();
+    
+    // ========== FALLING CURRENCY NOTES ==========
+    function createFallingNotes() {
+        const container = document.getElementById('fallingNotes');
+        for (let i = 0; i < 50; i++) {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = Math.random() * 5 + 3 + 's';
+            note.style.animationDelay = Math.random() * 10 + 's';
+            note.style.width = Math.random() * 40 + 40 + 'px';
+            note.style.height = Math.random() * 20 + 20 + 'px';
+            container.appendChild(note);
+        }
+    }
+    createFallingNotes();
+    
+    // ========== STAFF CREDENTIALS (FROM YOUR IMAGE) ==========
+    const users = [
+        { username: 'owner321', password: 'owner321', role: 'owner' },
+        { username: 'admin', password: 'riftcloudadmin1', role: 'admin' },
+        { username: 'managerog123', password: 'managerog123', role: 'manager' },
+        { username: 'staff1583', password: 'staff1583', role: 'staff' }
+    ];
+    
+    let currentUser = null;
+    let orders = JSON.parse(localStorage.getItem('riftcloud_orders')) || [];
+    const UPI_ID = 'johnsbiju@fam';
+    
+    function login(username, password) {
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            currentUser = { ...user };
+            localStorage.setItem('riftcloud_current_user', JSON.stringify(currentUser));
+            return true;
+        }
+        return false;
+    }
+    
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('riftcloud_current_user');
+        closeModal();
+        alert('Logged out successfully!');
+    }
+    
+    function getCurrentUser() {
+        if (!currentUser) {
+            const saved = localStorage.getItem('riftcloud_current_user');
+            if (saved) currentUser = JSON.parse(saved);
+        }
+        return currentUser;
+    }
+    
+    function hasPermission(requiredRole) {
+        const user = getCurrentUser();
+        if (!user) return false;
+        const hierarchy = { 'owner': 4, 'admin': 3, 'manager': 2, 'staff': 1 };
+        return hierarchy[user.role] >= hierarchy[requiredRole];
+    }
+    
+    function loginUser() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if (login(username, password)) {
+            closeModal();
+            openStaffPanel();
+        } else {
+            alert('Invalid credentials!');
+        }
+    }
+    
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+    }
+    
+    function scrollToSection(sectionId) {
+        document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+    
+    function openTracking() {
+        window.location.href = 'tracking.html';
+    }
+
+// ========== ORDER FUNCTIONS ==========
+function saveOrders() {
+    localStorage.setItem('riftcloud_orders', JSON.stringify(orders));
+}
+
+function createOrder(service, amount, customerName, customerEmail) {
+    const order = {
+        id: 'RIFT' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase(),
+        service: service,
+        amount: amount,
+        status: 'pending',
+        statusHistory: [{ status: 'pending', timestamp: new Date().toISOString(), note: 'Order placed' }],
+        customerName: customerName,
+        customerEmail: customerEmail,
+        timestamp: new Date().toISOString(),
+        transactionId: 'TXN' + Math.random().toString(36).substr(2, 8).toUpperCase()
+    };
+    orders.unshift(order);
+    saveOrders();
+    return order;
+}
+
+function updateOrder(orderId, updates) {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+        Object.assign(order, updates);
+        if (updates.status && updates.status !== order.status) {
+            order.statusHistory.push({ status: updates.status, timestamp: new Date().toISOString() });
+        }
+        saveOrders();
+        updateStaffDashboard();
+        return true;
+    }
+    return false;
+}
+
+function deleteOrder(orderId) {
+    if (!hasPermission('manager')) { alert('No permission!'); return false; }
+    if (confirm('Delete this order?')) {
+        orders = orders.filter(o => o.id !== orderId);
+        saveOrders();
+        updateStaffDashboard();
+        alert('Order deleted!');
+    }
+}
+
+function getOrderById(orderId) {
+    return orders.find(o => o.id === orderId);
+}
+
+// ========== STAFF DASHBOARD ==========
+function openStaffPanel() {
+    if (!getCurrentUser()) {
+        document.getElementById('loginModal').style.display = 'block';
+        return;
+    }
+    updateStaffDashboard();
+    document.getElementById('staffPanelModal').style.display = 'block';
+}
+
+function updateStaffDashboard() {
+    const total = orders.length;
+    const pending = orders.filter(o => o.status === 'pending').length;
+    const completed = orders.filter(o => o.status === 'completed').length;
+    const revenue = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.amount, 0);
+    
+    document.getElementById('totalOrders').textContent = total;
+    document.getElementById('pendingOrders').textContent = pending;
+    document.getElementById('completedOrders').textContent = completed;
+    document.getElementById('totalRevenue').textContent = `₹${revenue}`;
+    
+    const ordersTable = document.getElementById('ordersTable');
+    ordersTable.innerHTML = '';
+    
+    if (orders.length === 0) {
+        ordersTable.innerHTML = '<p style="text-align:center; color:#aaa;">No orders yet</p>';
+        return;
+    }
+    
+    const canEdit = hasPermission('manager');
+    
+    orders.forEach(order => {
+        const orderDiv = document.createElement('div');
+        orderDiv.className = 'order-item';
+        orderDiv.innerHTML = `
+            <div class="order-info">
+                <p><strong>${order.service}</strong> - ₹${order.amount}</p>
+                <p>ID: ${order.id}</p>
+                <p>Customer: ${order.customerName || 'N/A'} (${order.customerEmail || 'No email'})</p>
+                <p>Date: ${new Date(order.timestamp).toLocaleString()}</p>
+            </div>
+            <div>
+                <span class="order-status status-${order.status}">${order.status.toUpperCase()}</span>
+                ${canEdit ? `<button class="edit-btn" onclick="openEditOrder('${order.id}')">Edit</button>` : ''}
+                ${canEdit ? `<button class="delete-btn" onclick="deleteOrder('${order.id}')">Delete</button>` : ''}
+                ${order.status === 'pending' && hasPermission('staff') ? `<button class="complete-btn" onclick="updateOrder('${order.id}', {status:'completed'})">Complete</button>` : ''}
+            </div>
+        `;
+        ordersTable.appendChild(orderDiv);
+    });
+}
+
+function openEditOrder(orderId) {
+    const order = getOrderById(orderId);
+    if (!order) return;
+    document.getElementById('editOrderId').value = order.id;
+    document.getElementById('editService').value = order.service;
+    document.getElementById('editAmount').value = order.amount;
+    document.getElementById('editStatus').value = order.status;
+    document.getElementById('editCustomerName').value = order.customerName || '';
+    document.getElementById('editOrderModal').style.display = 'block';
+}
+
+function saveOrderEdit() {
+    const orderId = document.getElementById('editOrderId').value;
+    const updates = {
+        service: document.getElementById('editService').value,
+        amount: parseFloat(document.getElementById('editAmount').value),
+        status: document.getElementById('editStatus').value,
+        customerName: document.getElementById('editCustomerName').value
+    };
+    if (updateOrder(orderId, updates)) {
+        closeModal();
+        alert('Order updated!');
+    }
+}
+        
+        // ========== PAYMENT FUNCTIONS ==========
+        let currentOrder = null;
+        
+        function openPayment(service, amount) {
+            const modal = document.getElementById('upiModal');
+            document.getElementById('modalService').textContent = service;
+            document.getElementById('modalAmount').textContent = amount;
+            
+            const upiString = `upi://pay?pa=${UPI_ID}&pn=RiftCloud&am=${amount}&cu=INR`;
+            document.getElementById('qrCode').innerHTML = '';
+            new QRCode(document.getElementById('qrCode'), {
+                text: upiString,
+                width: 200,
+                height: 200
+            });
+            
+            currentOrder = { service, amount, timestamp: new Date().toISOString() };
+            modal.style.display = 'block';
+        }
+        
+        function confirmPayment() {
+            if (!currentOrder) return;
+            
+            const discordUsername = document.getElementById('customerDiscord').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            
+            if (!discordUsername) { alert('Please enter Discord username!'); return; }
+            if (!customerEmail) { alert('Please enter email!'); return; }
+            
+            const newOrder = createOrder(currentOrder.service, currentOrder.amount, discordUsername, customerEmail);
+            
+            alert(`✅ Order Confirmed!\n\nOrder ID: ${newOrder.id}\nService: ${newOrder.service}\nAmount: ₹${newOrder.amount}\n\nSave this Order ID for tracking!\n\nWe'll contact you on Discord within 24 hours.`);
+            
+            closeModal();
+            document.getElementById('paymentConfirmed').checked = false;
+            document.getElementById('confirmPaymentBtn').disabled = true;
+            document.getElementById('customerDiscord').value = '';
+            document.getElementById('customerEmail').value = '';
+            currentOrder = null;
+        }
+        
+        document.getElementById('paymentConfirmed')?.addEventListener('change', (e) => {
+            document.getElementById('confirmPaymentBtn').disabled = !e.target.checked;
+        });
+        
+        document.getElementById('staffLoginBtn')?.addEventListener('click', () => {
+            if (getCurrentUser()) openStaffPanel();
+            else document.getElementById('loginModal').style.display = 'block';
+        });
+        
+        // Check saved session
+        const savedUser = localStorage.getItem('riftcloud_current_user');
+        if (savedUser) currentUser = JSON.parse(savedUser);
+        
+        // Floating particles for background
+        function createExtraParticles() {
+            const bg = document.querySelector('.currency-bg');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = '#ffd700';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `floatParticle ${Math.random() * 10 + 5}s linear infinite`;
+                particle.style.opacity = Math.random() * 0.5;
+                bg.appendChild(particle);
+            }
+        }
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatParticle {
+                0% { transform: translateY(0) translateX(0); opacity: 0; }
+                10% { opacity: 0.5; }
+                90% { opacity: 0.5; }
+                100% { transform: translateY(-100vh) translateX(${Math.random() * 100 - 50}px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        createExtraParticles();
+        
+        console.log('%c✨ RIFTCLOUD DEVELOPMENT STUDIO ✨', 'color: #ffd700; font-size: 18px; font-weight: bold;');
+        console.log('%c💳 UPI ID: johnsbiju@fam', 'color: #ffaa00; font-size: 14px;');
+        console.log('%c👑 Owner: owner321', 'color: #ff6600; font-size: 12px;');
+        console.log('%c⚙️ Admin: admin / riftcloudadmin1', 'color: #ffaa00; font-size: 12px;');
+        console.log('%c📋 Manager: managerog123', 'color: #ffcc44; font-size: 12px;');
+        console.log('%c🛡️ Staff: staff1583', 'color: #ffff66; font-size: 12px;');
+    </script>
+</body>
+</html>
